@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +15,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+
+
+Route::post('/login', [AuthApiController::class, 'login'])->name('api.login');
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('logout', [AuthApiController::class, 'logout'])->name('api.logout');
+    
+    Route::get('/user', function (Request $request) {
+        $user =  $request->user();
+    
+        return response()->json([
+            'status' => 'success',
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'rol'=> $user->getRoleNames()->first(),
+            'celular' => $user->celular,
+            'photo_path' => $user->profile_photo_path,
+        ]);
+    });
+    
 });
