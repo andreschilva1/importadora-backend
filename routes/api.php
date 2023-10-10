@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Api\AlmacenController;
 use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ClientController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,10 +18,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-
-
 Route::post('/login', [AuthApiController::class, 'login'])->name('api.login');
+
+//Cliente
+Route::post('createClient', [ClientController::class, 'createClient']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('logout', [AuthApiController::class, 'logout'])->name('api.logout');
@@ -33,8 +36,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'email' => $user->email,
             'rol'=> $user->getRoleNames()->first(),
             'celular' => $user->celular,
-            'photo_path' => $user->profile_photo_path,
+            'photo_path' => $user->profile_photo_url,
         ]);
     });
-    
-});
+    //Almacén
+    Route::get('obtenerAlmacenes', [AlmacenController::class, 'obtenerAlmacenes']);
+    Route::post('crearAlmacen', [AlmacenController::class, 'crearAlmacen']);
+    Route::delete('eliminarAlmacen', [AlmacenController::class, 'eliminarAlmacen']);
+    Route::patch('editAlmacen', [AlmacenController::class, 'editAlmacen']);
+
+    //Empleado
+    Route::get('getEmployees', [UserController::class, 'getEmployees']);
+    Route::post('createEmployee', [UserController::class, 'createEmployee']);
+    Route::delete('deleteEmployee', [UserController::class, 'deleteEmployee']);
+    Route::patch('editEmployee', [UserController::class, 'editEmployee']);
+
+    //Cliente
+    Route::patch('editClient', [ClientController::class, 'editClient']);
+}); 

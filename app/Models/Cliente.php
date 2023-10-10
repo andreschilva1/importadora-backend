@@ -15,4 +15,8 @@ class Cliente extends Model
         'token_android',
         'user_id',
     ];
+
+    public function user(){
+        return $this->belongsTo('App\Models\Cliente','user_id','id');
+    }
 }
