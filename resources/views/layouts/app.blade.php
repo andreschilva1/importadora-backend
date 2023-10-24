@@ -10,12 +10,15 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-
-        <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+        
         <!-- Styles -->
         @livewireStyles
+        
+        <!-- Scripts -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireScripts
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"> </script>
+
     </head>
     <body class="font-sans antialiased">
         <x-banner />
@@ -38,8 +41,23 @@
             </main>
         </div>
 
-        @stack('modals')
+        <script>
+            document.addEventListener('livewire:initialized', () => {
+                Livewire.on('alert', ({mensaje}) => {
+                    console.log(mensaje);
+                    Swal.fire({
+                    icon: 'success',
+                    title: mensaje,
+                    showConfirmButton: false,
+                    timer: 1500
+                    }
+                )
 
-        @livewireScripts
+                });
+            });
+        </script>
+
+        @stack('js')
+
     </body>
 </html>
