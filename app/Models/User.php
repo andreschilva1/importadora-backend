@@ -65,4 +65,8 @@ class User extends Authenticatable
     public function cliente(){
         return $this->hasOne('App\Models\Cliente','user_id','id');
     }
+
+    public function ModelHasRole(){
+        return $this->hasOne(ModelHasRole::class,'model_id','id');
+    }
 }
