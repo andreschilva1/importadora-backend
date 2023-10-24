@@ -18,4 +18,19 @@ class Envio extends Model
         'metodo_envio_id',
         'envio_estado_id',
     ];
+
+    public function paquete()
+    {
+        return $this->belongsTo('App\Models\Paquete', 'paquete_id', 'id');
+    }
+
+    public function envioEstado()
+    {
+        return $this->belongsTo('App\Models\EnvioEstado', 'envio_estado_id', 'id');
+    }
+
+    public function metodoEnvio()
+    {
+        return $this->belongsTo('App\Models\MetodoEnvio', 'metodo_envio_id', 'id');
+    }
 }

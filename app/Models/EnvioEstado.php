@@ -13,4 +13,9 @@ class EnvioEstado extends Model
     protected $fillable = [
         'name',
     ];
+
+    public function envio()
+    {
+        return $this->hasMany('App\Models\Envio', 'envio_estado_id', 'id');
+    }
 }

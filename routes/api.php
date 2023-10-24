@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\AlmacenController;
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\EstadoEnvioController;
+use App\Http\Controllers\Api\MetodoEnvioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,16 +27,16 @@ Route::post('createClient', [ClientController::class, 'createClient']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('logout', [AuthApiController::class, 'logout'])->name('api.logout');
-    
+
     Route::get('/user', function (Request $request) {
         $user =  $request->user();
-    
+
         return response()->json([
             'status' => 'success',
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'rol'=> $user->getRoleNames()->first(),
+            'rol' => $user->getRoleNames()->first(),
             'celular' => $user->celular,
             'photo_path' => $user->profile_photo_url,
         ]);
@@ -53,4 +55,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Cliente
     Route::patch('editClient', [ClientController::class, 'editClient']);
-}); 
+
+    //Método de Envío
+    Route::get('getMetodoEnvio', [MetodoEnvioController::class, 'getMetodoEnvio']);
+    Route::post('createMetodoEnvio', [MetodoEnvioController::class, 'createMetodoEnvio']);
+    Route::delete('deleteMetodoEnvio', [MetodoEnvioController::class, 'deleteMetodoEnvio']);
+    Route::patch('editMetodoEnvio', [MetodoEnvioController::class, 'editMetodoEnvio']);
+
+    //Método de Envío
+    Route::get('getEstadoEnvio', [EstadoEnvioController::class, 'getEstadoEnvio']);
+});
