@@ -15,4 +15,9 @@ class MetodoEnvio extends Model
         'metodo',
         'costo_kg',
     ];
+
+    public function envio()
+    {
+        return $this->hasMany('App\Models\Envio', 'metodo_envio_id', 'id');
+    }
 }

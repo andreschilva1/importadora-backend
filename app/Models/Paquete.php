@@ -18,4 +18,9 @@ class Paquete extends Model
         'almacen_id',
         'empleado_id',
     ];
+
+    public function envio()
+    {
+        return $this->hasOne('App\Models\Envio', 'paquete_id', 'id');
+    }
 }

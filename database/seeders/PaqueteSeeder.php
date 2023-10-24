@@ -16,6 +16,7 @@ class PaqueteSeeder extends Seeder
         Paquete::create([
             'photo_path' => null,
             'codigo_rastreo' => 'RF547031698US',
+            'peso' => '10',
             'cliente_id' => '1',
             'empleado_id' => '2',
             'almacen_id' => '1',
