@@ -74,3 +74,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Estado de Envío
     Route::get('getEstadoEnvio', [EstadoEnvioController::class, 'getEstadoEnvio']);
+});
