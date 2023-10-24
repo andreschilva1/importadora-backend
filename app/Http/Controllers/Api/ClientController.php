@@ -53,4 +53,20 @@ class ClientController extends Controller
             return response()->json(['mensaje' => $e->getMessage()], 500);
         }
     }
+
+    public function getClientByCasillero(Request $request){
+        try {
+            $cliente = Cliente::where("numero_casillero", $request->numero_casillero)->first();
+            if (!$cliente) {
+                return response()->json(['mensaje' => 'No se encontró el cliente'], 404);
+            }
+
+            return response()->json([
+                'id' => $cliente->id,
+                'nombre' => $cliente->user->name,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => $e->getMessage()], 500);
+        }
+    }
 }
