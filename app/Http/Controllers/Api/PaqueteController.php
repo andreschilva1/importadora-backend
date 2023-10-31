@@ -16,6 +16,23 @@ use Illuminate\Support\Facades\Storage;
 class PaqueteController extends Controller
 {
 
+    public function obtenerPaquetes(Req $req)
+    {
+        try {
+            $user = $req->user();
+            $rol = $user->getRoleNames()->first();
+            if ($rol == "Cliente") {
+                $paquetes = Paquete::where('cliente_id', $user->id)->get();
+                return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
+            } else {
+                $paquetes = Paquete::get();
+                return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => $e->getMessage()], 500);
+        }
+    }
+
     function reconocerPaquete(Req $req)
     {
         try {
@@ -24,7 +41,7 @@ class PaqueteController extends Controller
             $path = $image->storeAs('', $originalName, 's3');
             $imegeUrl = Storage::disk('s3')->url($path);
             Utils::eliminarArchivosTemporales('s3');
-            
+
             $client = new Client();
 
             $headers = [
@@ -76,7 +93,8 @@ class PaqueteController extends Controller
         }
     }
 
-    function createPaquete(Req $req) {
+    function createPaquete(Req $req)
+    {
         try {
             DB::beginTransaction();
             $paquete = new Paquete();
@@ -90,7 +108,6 @@ class PaqueteController extends Controller
             DB::commit();
 
             return response()->json(['mensaje' => 'Paquete creado exitosamente'], 200);
-
         } catch (\Throwable $th) {
             DB::rollBack();
             return response()->json(['mensaje' => $th->getMessage()], 500);

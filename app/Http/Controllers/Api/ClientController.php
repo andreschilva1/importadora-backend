@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Hash;
 
 class ClientController extends Controller
 {
-    public function createClient(Request $request){
+    public function createClient(Request $request)
+    {
         try {
             DB::beginTransaction();
             $user = new User();
@@ -45,16 +46,18 @@ class ClientController extends Controller
         }
     }
 
-    public function editClient(Request $request){
+    public function editClient(Request $request)
+    {
         try {
-            $cliente = User::where("id", $request->id)->first();
+            $cliente = User::join('clientes', 'users.id', 'clientes.user_id')->where("users.id", $request->id)->first();
             return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $cliente], 200);
         } catch (\Exception $e) {
             return response()->json(['mensaje' => $e->getMessage()], 500);
         }
     }
 
-    public function getClientByCasillero(Request $request){
+    public function getClientByCasillero(Request $request)
+    {
         try {
             $cliente = Cliente::where("numero_casillero", $request->numero_casillero)->first();
             if (!$cliente) {

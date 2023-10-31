@@ -22,7 +22,7 @@ class EnvioEstadoSeeder extends Seeder
         ]);
 
         EnvioEstado::create([
-            'name' => 'listo para entregar',
+            'name' => 'Listo para entregar',
         ]);
 
         EnvioEstado::create([
