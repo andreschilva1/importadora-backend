@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AlmacenController;
 use App\Http\Controllers\Api\AuthApiController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ClientController;
+use App\Http\Controllers\Api\EnvioController;
 use App\Http\Controllers\Api\EstadoEnvioController;
 use App\Http\Controllers\Api\MetodoEnvioController;
 use App\Http\Controllers\Api\PaqueteController;
@@ -31,11 +32,11 @@ Route::post('createClient', [ClientController::class, 'createClient']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
-    Route::get('logout', [AuthApiController::class, 'logout'])->name('api.logout');    
-    
+    Route::get('logout', [AuthApiController::class, 'logout'])->name('api.logout');
+
     Route::get('/user', function (Request $request) {
         $user =  $request->user();
-        
+
         return response()->json([
             'status' => 'success',
             'id' => $user->id,
@@ -51,21 +52,22 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('crearAlmacen', [AlmacenController::class, 'crearAlmacen']);
     Route::delete('eliminarAlmacen', [AlmacenController::class, 'eliminarAlmacen']);
     Route::patch('editAlmacen', [AlmacenController::class, 'editAlmacen']);
-    
+
     //Empleado
     Route::get('getEmployees', [UserController::class, 'getEmployees']);
     Route::post('createEmployee', [UserController::class, 'createEmployee']);
     Route::delete('deleteEmployee', [UserController::class, 'deleteEmployee']);
     Route::patch('editEmployee', [UserController::class, 'editEmployee']);
-    
+
     //Cliente
     Route::patch('editClient', [ClientController::class, 'editClient']);
     Route::post('getClienteByCasillero', [ClientController::class, 'getClientByCasillero']);
-  
+
     //paquete
     Route::post('/createPaquete', [PaqueteController::class, 'createPaquete'])->name('api.createPaquete');
+    Route::get('obtenerPaquetes', [PaqueteController::class, 'obtenerPaquetes']);
     Route::post('/reconocerPaquete', [PaqueteController::class, 'reconocerPaquete'])->name('api.reconocerPaquete');
-  
+
     //Método de Envío
     Route::get('getMetodoEnvio', [MetodoEnvioController::class, 'getMetodoEnvio']);
     Route::post('createMetodoEnvio', [MetodoEnvioController::class, 'createMetodoEnvio']);
@@ -74,3 +76,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Estado de Envío
     Route::get('getEstadoEnvio', [EstadoEnvioController::class, 'getEstadoEnvio']);
+
+    //Envio
+    Route::post('createEnvio', [EnvioController::class, 'createEnvio']);
+    Route::patch('getEnvio', [EnvioController::class, 'getEnvio']);
+    Route::post('storeEnvio', [EnvioController::class, 'storeEnvio']);
+});

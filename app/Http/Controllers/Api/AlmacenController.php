@@ -12,6 +12,8 @@ class AlmacenController extends Controller
     public function obtenerAlmacenes()
     {
         try {
+            // $user = $request->user()->getRoleNames()->first();
+            // $user = auth('web')->user();
             $almacenes = Almacen::get();
             return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $almacenes], 200);
         } catch (\Exception $e) {
@@ -19,7 +21,8 @@ class AlmacenController extends Controller
         }
     }
 
-    public function crearAlmacen(Request $request){
+    public function crearAlmacen(Request $request)
+    {
         try {
             DB::beginTransaction();
             $almacen = new Almacen();
@@ -58,6 +61,5 @@ class AlmacenController extends Controller
             DB::rollback();
             return response()->json(['mensaje' => $e->getMessage()], 500);
         }
-        
     }
 }

@@ -33,4 +33,9 @@ class Envio extends Model
     {
         return $this->belongsTo('App\Models\MetodoEnvio', 'metodo_envio_id', 'id');
     }
+
+    public function pago()
+    {
+        return $this->hasOne('App\Models\Pago', 'envio_id', 'id');
+    }
 }
