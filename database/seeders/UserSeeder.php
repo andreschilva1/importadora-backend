@@ -41,7 +41,7 @@ class UserSeeder extends Seeder
         ])->assignRole('Admin');
 
         User::create([
-            'name' => 'Chile',
+            'name' => 'Eduardo',
             'email' => 'Eduardo@gmail.com',
             'password' => $password,
             'profile_photo_path' => null,
@@ -49,7 +49,7 @@ class UserSeeder extends Seeder
         ])->assignRole('Empleado');
 
         User::create([
-            'name' => 'Chile',
+            'name' => 'Pepe',
             'email' => 'pepe@gmail.com',
             'password' => $password,
             'profile_photo_path' => null,
@@ -57,42 +57,42 @@ class UserSeeder extends Seeder
         ])->assignRole('Empleado');
 
         User::create([
-            'name' => 'Chile',
+            'name' => 'Lucas',
             'email' => 'lucas@gmail.com',
             'password' => $password,
             'profile_photo_path' => null,
-            'celular' => '65152340',
-        ])->assignRole('Empleado');
+            'celular' => '69164120',
+        ])->assignRole('Cliente');
 
         User::create([
-            'name' => 'Chile',
+            'name' => 'Jerardo',
             'email' => 'jerardo@gmail.com',
             'password' => $password,
             'profile_photo_path' => null,
-            'celular' => '65152340',
-        ])->assignRole('Empleado');
+            'celular' => '68953214',
+        ])->assignRole('Cliente');
         User::create([
-            'name' => 'Chile',
+            'name' => 'Carlos',
             'email' => 'carlos@gmail.com',
             'password' => $password,
             'profile_photo_path' => null,
-            'celular' => '65152340',
-        ])->assignRole('Empleado');
+            'celular' => '78954632',
+        ])->assignRole('Cliente');
         User::create([
-            'name' => 'Chile',
+            'name' => 'Lucho',
             'email' => 'lucho@gmail.com',
             'password' => $password,
             'profile_photo_path' => null,
-            'celular' => '65152340',
-        ])->assignRole('Empleado');
+            'celular' => '65842139',
+        ])->assignRole('Cliente');
         
         User::create([
-            'name' => 'Chile',
-            'email' => 'loquito@gmail.com',
+            'name' => 'Miguel',
+            'email' => 'miguel@gmail.com',
             'password' => $password,
             'profile_photo_path' => null,
-            'celular' => '65152340',
-        ])->assignRole('Empleado');
+            'celular' => '78921435',
+        ])->assignRole('Cliente');
                 
     }
 }

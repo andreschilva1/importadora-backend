@@ -34,9 +34,9 @@
     <x-validation-errors class="mt-4" />   
     <!-- Footer -->
     <div class="pt-5 mt-6 border-t border-slate-200">
-        <div class="text-sm">
+        {{-- <div class="text-sm">
             {{ __('¿No tienes una cuenta?') }} <a class="font-medium text-indigo-500 hover:text-indigo-600" href="{{ route('register') }}">{{ __('Registrate') }}</a>
-        </div>
+        </div> --}}
         <!-- Warning -->
         <div class="mt-5">
             {{-- <div class="bg-amber-100 text-amber-600 px-3 py-2 rounded">

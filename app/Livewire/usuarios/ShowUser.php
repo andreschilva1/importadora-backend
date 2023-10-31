@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\usuarios;
+namespace App\Livewire\Usuarios;
 
 use App\Models\User;
 use App\Utils\Utils;
@@ -26,6 +26,7 @@ class ShowUser extends Component
         'email' => '',
         'password' => '',
         'profile_photo_path' => '',
+        'celular' => '',
         'rol' => '',
     ];
     public $userId;
@@ -37,6 +38,7 @@ class ShowUser extends Component
         'usuario.name' => 'required|max:25',
         'usuario.email' => 'required|email|max:25',
         'usuario.rol' => 'required',
+        'usuario.celular' => 'required|max:8',
     ];
 
 
@@ -88,6 +90,7 @@ class ShowUser extends Component
        $this->usuario['name'] = $user->name;    
        $this->usuario['email'] = $user->email;
        $this->usuario['profile_photo_path'] = $user->profile_photo_path;
+       $this->usuario['celular'] = $user->celular;
 
     }
 
@@ -116,7 +119,7 @@ class ShowUser extends Component
         if ($this->usuario['password'] != "") {
             $user->password =  Hash::make($this->pass);
         }
-
+        $user->celular = $this->usuario['celular'];
         $user->save();
         $user->roles()->sync($this->usuario['rol']);
         

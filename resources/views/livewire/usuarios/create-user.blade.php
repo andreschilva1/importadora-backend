@@ -82,6 +82,15 @@
                 </div>
 
                 <div class="mb-4">
+                    <label for="">
+                        celular<span class="text-rose-500">*</span>
+                    </label>
+                    <x-input type="number" class="w-full" wire:model.live="celular" />
+                    <x-input-error for="celular" />
+
+                </div>
+
+                <div class="mb-4">
                     <label class="mr4" for="">
                         Tipo de Usuario<span class="text-rose-500">*</span>
                     </label>
