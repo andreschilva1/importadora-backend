@@ -1,6 +1,6 @@
 <?php
 
-use App\Livewire\usuarios\ShowUser;
+use App\Livewire\Usuarios\ShowUser;
 use Illuminate\Support\Facades\Route;
 
 /*

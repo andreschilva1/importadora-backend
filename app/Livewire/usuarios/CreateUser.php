@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\usuarios;
+namespace App\Livewire\Usuarios;
 
 use App\Models\User;
 use Spatie\Permission\Models\Role;
@@ -17,7 +17,7 @@ class CreateUser extends Component
     use WithFileUploads;
 
     public $open= false;
-    public $name, $email, $password,$rol, $foto, $identificador;
+    public $name, $email, $password,$rol, $foto, $identificador,$celular;
     public $path;
 
 
@@ -26,8 +26,8 @@ class CreateUser extends Component
         'email' => 'required|email|unique:users|max:25',
         'password' => 'required|max:50',
         'rol' => 'required',
-        'foto' => 'required|image|max:2048'
-        
+        'foto' => 'required|image|max:2048',
+        'celular' => 'required|max:8',
     ];
     
     public function mount()
@@ -59,6 +59,7 @@ class CreateUser extends Component
         $usuario->name = $this->name;
         $usuario->email = $this->email;
         $usuario->password =  Hash::make($this->password);
+        $usuario->celular = $this->celular;
         $usuario->save();
 
         $nombre = $this->foto->getClientOriginalName();
