@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\EnvioController;
 use App\Http\Controllers\Api\EstadoEnvioController;
 use App\Http\Controllers\Api\MetodoEnvioController;
 use App\Http\Controllers\Api\PaqueteController;
+use App\Http\Controllers\Api\WebHookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,7 @@ Route::post('/login', [AuthApiController::class, 'login'])->name('api.login');
 Route::post('createClient', [ClientController::class, 'createClient']);
 
 
+Route::post('webHook', [WebHookController::class, 'notify']);
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
