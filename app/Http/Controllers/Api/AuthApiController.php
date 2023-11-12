@@ -27,7 +27,8 @@ class AuthApiController extends Controller
                 'rol'=> $rol,
                 'celular' => $user->celular,
                 'photo_path' => $user->profile_photo_path,
-                'casillero' =>($rol == "Cliente" ) ?  $user->cliente->numero_casillero : '', 
+                'casillero' =>($rol == "Cliente" ) ?  $user->cliente->numero_casillero : '',
+                'almacen_id' => ($rol == "Empleado" ) ?  $user->empleado->almacen_id : '',
             ]);
         } else {
             return response()->json([

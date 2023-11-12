@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Empleado;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,12 @@ class UserController extends Controller
             $user->celular = $request->celular;
             $user->save();
             $user->assignRole('Empleado');
+
+            $empleado = new Empleado();
+            $empleado->user_id = $user->id;
+            $empleado->almacen_id = $request->almacenId;
+            $empleado->save();
+            
             DB::commit();
             return response()->json(['mensaje' => 'Empleado creado exitosamente'], 200);
         } catch (\Exception $e) {

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Usuarios;
 
+use App\Models\Almacen;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Livewire\Component;
@@ -9,6 +10,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Cliente;
+use App\Models\Empleado;
 use App\Utils\Utils;
 use Illuminate\Support\Facades\File;
 
@@ -17,7 +19,7 @@ class CreateUser extends Component
     use WithFileUploads;
 
     public $open= false;
-    public $name, $email, $password,$rol, $foto, $identificador,$celular;
+    public $name, $email, $password,$rol, $foto, $identificador,$celular,$almacen_id;
     public $path;
 
 
@@ -26,10 +28,10 @@ class CreateUser extends Component
         'email' => 'required|email|unique:users|max:25',
         'password' => 'required|max:50',
         'rol' => 'required',
-        'foto' => 'required|image|max:2048',
+        /* 'foto' => 'required|image', */
         'celular' => 'required|max:8',
     ];
-    
+
     public function mount()
     {
         $this->identificador = rand();
@@ -52,7 +54,16 @@ class CreateUser extends Component
     public function save()
     {
         $this->validate();
-        
+
+        $rol = Role::find($this->rol);
+
+        if ( $rol->name  == 'Empleado') {
+            if ($this->almacen_id == null) {
+                $this->dispatch('alert', icono: 'error', mensaje: 'Debe seleccionar un almacen');
+                return;
+            }
+        }
+
         $usuario = new User();
         
         //$foto = $this->foto->store('public/clientes/');
@@ -62,12 +73,12 @@ class CreateUser extends Component
         $usuario->celular = $this->celular;
         $usuario->save();
 
-        $nombre = $this->foto->getClientOriginalName();
-        //dd($usuario->id);
-        $path = $this->foto->storeAs('', $nombre, 's3');
-        $fotoUrl = Storage::disk('s3')->url($path);
-
-        $usuario->profile_photo_path = $fotoUrl;
+        if ($this->foto != null) {
+            $nombre = $this->foto->getClientOriginalName();
+            $path = $this->foto->storeAs('', $nombre, 's3');
+            $fotoUrl = Storage::disk('s3')->url($path);
+            $usuario->profile_photo_path = $fotoUrl;
+        }
         $usuario->save();
         
         $usuario->roles()->sync($this->rol);
@@ -83,13 +94,22 @@ class CreateUser extends Component
             ]);
             $usuario->save();
         }
+
+        if ($usuario->getRoleNames()->first() == 'Empleado') {
+
+            
+            Empleado::create([
+                'user_id' => $usuario->id,
+                'almacen_id' => $this->almacen_id,
+            ]);
+        }
         
         //eliminar archivos temporales
         Utils::eliminarArchivosTemporales('livewire-tmp');
         
         $this->reset(['name', 'email','password','foto']);
         $this->dispatch('render')->to(ShowUser::class);
-        $this->dispatch('alert', mensaje: 'El usuario se creo satisfactoriamente');
+        $this->dispatch('alert', icono: 'success', mensaje: 'Se creo el usuario correctamente');
         $this->open = !$this->open;
         
     }
@@ -97,6 +117,7 @@ class CreateUser extends Component
     public function render()
     {
         $roles = Role::all();
-        return view('livewire.usuarios.create-user',compact('roles'));
+        $almacenes = Almacen::all();
+        return view('livewire.usuarios.create-user',compact('roles','almacenes'));
     }
 }
