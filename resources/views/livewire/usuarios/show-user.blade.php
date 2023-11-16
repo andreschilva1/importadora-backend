@@ -90,6 +90,9 @@
                                 <th
                                     class=" p-2 text-gray-900 font-bold md:border-2 md:border-grey-500 text-left block md:table-cell">
                                     Rol</th>
+                                <th
+                                class=" p-2 text-gray-900 font-bold md:border-2 md:border-grey-500 text-left block md:table-cell">
+                                almacen</th>
 
                                 <th
                                     class=" p-2 text-gray-900 font-bold md:border-2 md:border-grey-500 text-left block md:table-cell">
@@ -147,6 +150,16 @@
                                             {{ $user->getRoleNames()->first() }}
                                         @else
                                             sin Rol
+                                        @endif
+
+
+                                    </td>
+
+                                    <td class="p-2 md:border md:border-grey-500 text-left block md:table-cell">
+                                        <span class="inline-block w-1/3 md:hidden font-bold">Rol:</span>
+
+                                        @if ($user->getRoleNames()->first() == 'Empleado')
+                                            {{ $user->empleado->almacen->name}}
                                         @endif
 
 
@@ -299,7 +312,7 @@
                                     <label class="mr4" for="">
                                         Tipo de Usuario<span class="text-rose-500">*</span>
                                     </label>
-                                    <select class="form-select w-full" wire:model="usuario.rol">
+                                    <select class="form-select w-full" wire:model.live="usuario.rol">
                                         <option value="{{ $usuario['rol'] }}"></option>
                                         @foreach ($roles as $role)
                                             <option value="{{ $role->id }}">{{ $role->name }}</option>
@@ -308,6 +321,23 @@
                                     <x-input-error for="usuario.rol" />
 
                                 </div>
+
+                                @if ($usuario['rol'] == '2')    
+                                    <div class="mb-4">
+                                        <label class="mr4" for="">
+                                            Almacen <span class="text-rose-500">*</span>
+                                        </label>
+
+                                        <select class="form-select w-full" wire:model.live="usuario.almacen_id">
+                                            <option value=""></option>
+                                            @foreach ($almacenes as $almacen)
+                                                <option value="{{ $almacen->id }}">{{ $almacen->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <x-input-error for="usuario.almacen_id" />
+
+                                    </div>
+                                @endif
 
 
 

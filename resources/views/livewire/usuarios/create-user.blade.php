@@ -97,13 +97,30 @@
 
                     <select class="form-select w-full" wire:model.live="rol">
                         <option value=""></option>
-                        @foreach ($roles as $rol)
-                            <option value="{{ $rol->id }}">{{ $rol->name }}</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->id }}">{{ $role->name }}</option>
                         @endforeach
                     </select>
                     <x-input-error for="rol" />
 
                 </div>
+
+                @if ($rol == '2')    
+                    <div class="mb-4">
+                        <label class="mr4" for="">
+                            Almacen <span class="text-rose-500">*</span>
+                        </label>
+
+                        <select class="form-select w-full" wire:model.live="almacen_id">
+                            <option value=""></option>
+                            @foreach ($almacenes as $almacen)
+                                <option value="{{ $almacen->id }}">{{ $almacen->name }}</option>
+                            @endforeach
+                        </select>
+                        <x-input-error for="almacen_id" />
+
+                    </div>
+                @endif
 
 
             </div>

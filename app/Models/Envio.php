@@ -38,4 +38,9 @@ class Envio extends Model
     {
         return $this->hasOne('App\Models\Pago', 'envio_id', 'id');
     }
+
+    public function seguimiento()
+    {
+        return $this->hasMany(Seguimiento::class, 'envio_id', 'id');
+    }
 }

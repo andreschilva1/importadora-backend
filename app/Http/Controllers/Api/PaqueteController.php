@@ -45,7 +45,7 @@ class PaqueteController extends Controller
             $client = new Client();
 
             $headers = [
-                'Ocp-Apim-Subscription-Key' => 'd2a335ad99e3491db4e71010b2b107d1',
+                'Ocp-Apim-Subscription-Key' => config('azure.cognitiveKey'),
                 'Content-Type' => 'application/json'
             ];
 
@@ -65,7 +65,7 @@ class PaqueteController extends Controller
             //esperamos 3 segundos para obtener los resultados
             sleep(5);
             $headers = [
-                'Ocp-Apim-Subscription-Key' => 'd2a335ad99e3491db4e71010b2b107d1'
+                'Ocp-Apim-Subscription-Key' => config('azure.cognitiveKey'),
             ];
 
             $requestgetResult = new Request('GET', $endpointToGetResult, $headers);
@@ -96,14 +96,15 @@ class PaqueteController extends Controller
     function createPaquete(Req $req)
     {
         try {
+            $userActual = $req->user();
             DB::beginTransaction();
             $paquete = new Paquete();
             $paquete->photo_path = $req->photo_path;
             $paquete->codigo_rastreo = $req->codigo_rastreo;
             $paquete->peso = $req->peso;
             $paquete->cliente_id = $req->cliente_id;
-            $paquete->almacen_id = $req->almacen_id;
-            $paquete->empleado_id = $req->empleado_id;
+            $paquete->almacen_id = $userActual->empleado->almacen_id;
+            $paquete->empleado_id = $userActual->id;  
             $paquete->save();
             DB::commit();
 

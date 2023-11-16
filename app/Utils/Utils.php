@@ -2,8 +2,6 @@
 
 namespace App\Utils;
 
-
-
 class Utils 
 {
    static function eliminarArchivosTemporales($carpetaInStorageApp){  

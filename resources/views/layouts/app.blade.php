@@ -43,10 +43,10 @@
 
         <script>
             document.addEventListener('livewire:initialized', () => {
-                Livewire.on('alert', ({mensaje}) => {
-                    console.log(mensaje);
+                Livewire.on('alert', ({ icono, mensaje }) => {
+                    console.log(icono, mensaje);
                     Swal.fire({
-                    icon: 'success',
+                    icon: icono,
                     title: mensaje,
                     showConfirmButton: false,
                     timer: 1500

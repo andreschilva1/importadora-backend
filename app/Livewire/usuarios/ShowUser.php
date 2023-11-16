@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Usuarios;
 
+use App\Models\Almacen;
+use App\Models\Empleado;
 use App\Models\User;
 use App\Utils\Utils;
 use Illuminate\Support\Facades\Storage;
@@ -28,9 +30,10 @@ class ShowUser extends Component
         'profile_photo_path' => '',
         'celular' => '',
         'rol' => '',
+        'almacen_id' => '',
     ];
-    public $userId;
     
+    public $userId;
 
     protected $listeners = ['render', 'delete'];
 
@@ -46,12 +49,13 @@ class ShowUser extends Component
     {
 
         $roles = Role::all();
+        $almacenes = Almacen::all();
         $usuarios = User::join('model_has_roles', 'model_has_roles.model_id', 'users.id')
             ->join('roles', 'roles.id', 'model_has_roles.role_id')->select('users.*', 'roles.name as rol')
             ->where('users.name', 'like', '%' . $this->search . '%')
             ->orWhere('users.email', 'like', '%' . $this->search . '%')
             ->orWhere('roles.name', 'like', '%' . $this->search . '%')->orderBy('users.id', 'desc')->paginate($this->count);
-        return view('livewire.usuarios.show-user', compact('usuarios', 'roles'));
+        return view('livewire.usuarios.show-user', compact('usuarios', 'roles', 'almacenes'));
     }
 
 
@@ -92,13 +96,29 @@ class ShowUser extends Component
        $this->usuario['profile_photo_path'] = $user->profile_photo_path;
        $this->usuario['celular'] = $user->celular;
 
+       if ($user->roles->pluck('name')->first() == 'Empleado') {
+           $empleadoActual = $user->empleado;
+           $this->usuario['almacen_id'] = $empleadoActual->almacen_id;
+       }
+
     }
 
     public function update()
     {
         $this->validate();
-
+        
+        
         $user = User::find($this->userId);
+        
+        if ( $user->roles->pluck('name')->first()  == 'Empleado') {
+            if ($this->usuario['almacen_id'] == null) {
+                $this->dispatch('alert', icono: 'error', mensaje: 'Debe seleccionar un almacen');
+                return;
+            }
+            $empleadoActual = $user->empleado;
+            $empleadoActual->almacen_id = $this->usuario['almacen_id'];
+            $empleadoActual->save();
+        }
 
         if ($this->foto) {
             if ($user->profile_photo_path) {
@@ -124,8 +144,8 @@ class ShowUser extends Component
         $user->roles()->sync($this->usuario['rol']);
         
         Utils::eliminarArchivosTemporales('livewire-tmp');
-        
-        $this->dispatch('alert', mensaje: 'El usuario se actualizo satisfactoriamente');
+
+        $this->dispatch('alert', mensaje: 'El usuario se actualizo satisfactoriamente', icono: 'success');
         $this->reset(['open', 'usuario', 'foto', 'identificador']);
         $this->open = false;
         $this->dispatch('render')->self();

@@ -16,4 +16,8 @@ class Almacen extends Model
         'telefono',
         'pais',
     ];
+
+    public function empleados(){
+        return $this->hasMany(Empleado::class,'almacen_id','id');
+    }
 }
