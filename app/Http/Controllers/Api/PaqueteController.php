@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\NotificacionPaquete;
 use App\Http\Controllers\Controller;
 use App\Models\Paquete;
 use App\Utils\Utils;
+use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Http\Request as Req;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Facades\Image;
 
 
 
@@ -21,6 +24,7 @@ class PaqueteController extends Controller
         try {
             $user = $req->user();
             $rol = $user->getRoleNames()->first();
+
             if ($rol == "Cliente") {
                 $paquetes = Paquete::where('cliente_id', $user->id)->get();
                 return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
@@ -38,9 +42,27 @@ class PaqueteController extends Controller
         try {
             $image = $req->file('imagen');
             $originalName = $image->getClientOriginalName();
-            $path = $image->storeAs('', $originalName, 's3');
-            $imegeUrl = Storage::disk('s3')->url($path);
-            Utils::eliminarArchivosTemporales('s3');
+            $fileNameWithoutExtension = pathinfo($originalName, PATHINFO_FILENAME);
+           
+            Log::info($fileNameWithoutExtension);
+
+
+            //comprimir imagen
+            $imageInstance = Image::make($image);
+            $newWidth = 1024;
+            // Calcular la nueva altura para conservar la relación de aspecto
+            $newHeight = intval($newWidth * ($imageInstance->height() / $imageInstance->width()));
+            Log::info($newHeight);
+            $imageInstance->resize($newWidth, $newHeight);
+            $encodedImage = (string) $imageInstance->encode('jpg', 40);
+            
+
+            //guardar en s3
+            $name = $fileNameWithoutExtension . '.jpg';
+            //Log::info($name);
+            Storage::disk('s3')->put($name, $encodedImage);         
+            $imegeUrl = Storage::disk('s3')->url($originalName);
+
 
             $client = new Client();
 
@@ -54,7 +76,7 @@ class PaqueteController extends Controller
              "urlSource": "' . $imegeUrl . '" 
             }';
 
-            $analyzeLabelRequest = new Request('POST', 'https://reconocimientopaquetes.cognitiveservices.azure.com/formrecognizer/documentModels/EtiquetasPacketes:analyze?api-version=2023-07-31', $headers, $body);
+            $analyzeLabelRequest = new Request('POST', 'https://reconocimientoPaquetes2.cognitiveservices.azure.com/formrecognizer/documentModels/EtiquetasPacketes:analyze?api-version=2023-07-31', $headers, $body);
             $analyzeLabelResponse = $client->sendAsync($analyzeLabelRequest)->wait();
 
             $headerResponse = $analyzeLabelResponse->getHeaders();
@@ -63,14 +85,32 @@ class PaqueteController extends Controller
             $endpointToGetResult = (string) $headerResponse["Operation-Location"][0];
 
             //esperamos 3 segundos para obtener los resultados
-            sleep(5);
-            $headers = [
-                'Ocp-Apim-Subscription-Key' => config('azure.cognitiveKey'),
-            ];
+            Log::info($endpointToGetResult);
+            sleep(2);
+            $isDone = false;
+            while(!$isDone) {
+                // Hacer una solicitud para obtener el estado de la operación
+                $headers = [
+                    'Ocp-Apim-Subscription-Key' => config('azure.cognitiveKey'),
+                ];
+    
+                $requestgetResult = new Request('GET', $endpointToGetResult, $headers);
+                $responseResult = $client->sendAsync($requestgetResult)->wait();
+                $responseBody = json_decode($responseResult->getBody());
 
-            $requestgetResult = new Request('GET', $endpointToGetResult, $headers);
-            $responseResult = $client->sendAsync($requestgetResult)->wait();
-            $responseBody = json_decode($responseResult->getBody());
+                //obtener el codigo estado de la solicitud
+                $statusCode = $responseResult->getStatusCode();
+                // Verificar si la operación está completa
+                Log::info($statusCode);
+                Log::info($responseBody->status);
+                if ($responseBody->status == 'succeeded') {
+                    $isDone = true;
+                } else {
+                    // Esperar un poco antes de hacer la próxima solicitud
+                    sleep(1);
+                }
+            }
+            
             $fields = $responseBody->analyzeResult->documents[0]->fields;
 
             return response()->json(
@@ -84,13 +124,14 @@ class PaqueteController extends Controller
                 $responseResult->getStatusCode()
             );
         } catch (\Throwable $th) {
+            Log::info($th->getMessage());
             return response()->json(
                 [
                     'mensaje' => $th->getMessage(),
                 ],
                 500
             );
-        }
+        } 
     }
 
     function createPaquete(Req $req)
@@ -104,9 +145,11 @@ class PaqueteController extends Controller
             $paquete->peso = $req->peso;
             $paquete->cliente_id = $req->cliente_id;
             $paquete->almacen_id = $userActual->empleado->almacen_id;
-            $paquete->empleado_id = $userActual->id;  
+            $paquete->empleado_id = $userActual->id;
             $paquete->save();
             DB::commit();
+
+            NotificacionPaquete::dispatch($paquete);
 
             return response()->json(['mensaje' => 'Paquete creado exitosamente'], 200);
         } catch (\Throwable $th) {

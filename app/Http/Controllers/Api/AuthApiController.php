@@ -18,6 +18,12 @@ class AuthApiController extends Controller
             $token = $user->createToken('API TOKEN')->plainTextToken;
             $rol = $user->getRoleNames()->first();
             
+            if($rol == "Cliente"){
+                $cliente = $user->cliente;
+                $cliente->token_android = $request->token_device;
+                $cliente->save();
+            }
+            
             return response()->json([
                 'status' => 'success',
                 'token' => $token,
@@ -45,6 +51,13 @@ class AuthApiController extends Controller
         
         //$user->token_android = null;
         $user->tokens()->delete();
+        $rol = $user->getRoleNames()->first();
+
+        if($rol == "Cliente"){
+            $cliente = $user->cliente;
+            $cliente->token_android = null;
+            $cliente->save();
+        }
 
         //Auth::user()->Passport::tokensExpireIn(Carbon::now()->addDays(15));
         return response()->json([
