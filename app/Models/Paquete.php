@@ -17,6 +17,8 @@ class Paquete extends Model
         'cliente_id',
         'almacen_id',
         'empleado_id',
+        'consolidacion_estado_id',
+        'consolidado_id'
     ];
 
     public function envio()
@@ -27,5 +29,10 @@ class Paquete extends Model
     public function cliente()
     {
         return $this->belongsTo(Cliente::class, 'cliente_id', 'id');
+    }
+    
+    public function paquete()
+    {
+        return $this->hasMany('App\Models\Paquete', 'consolidado_id', 'id');
     }
 }

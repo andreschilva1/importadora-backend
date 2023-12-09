@@ -2,21 +2,22 @@
 
 namespace Database\Seeders;
 
-use App\Models\Almacen;
+use App\Models\Pais;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class AlmacenSeeder extends Seeder
+class PaisSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Almacen::create([
-            'name' => 'Alan Fergusson',
-            'direccion' => '8216 NW 68th St Miami, FL 33166',
-            'pais_id' => '1',
+        Pais::create([
+            'name' => 'USA',
+        ]);
+        Pais::create([
+            'name' => 'Brasil',
         ]);
     }
 }

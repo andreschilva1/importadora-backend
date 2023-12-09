@@ -17,12 +17,14 @@ class MetodoEnvioSeeder extends Seeder
             'transportista' => 'BOA',
             'metodo' => 'aereo',
             'costo_kg' => '25',
+            'pais_id' => '1',
         ]);
 
         MetodoEnvio::create([
             'transportista' => 'TAB',
             'metodo' => 'aereo',
             'costo_kg' => '35',
+            'pais_id' => '1',
         ]);
     }
 }
