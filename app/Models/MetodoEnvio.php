@@ -14,10 +14,16 @@ class MetodoEnvio extends Model
         'transportista',
         'metodo',
         'costo_kg',
+        'pais_id',
     ];
 
     public function envio()
     {
         return $this->hasMany('App\Models\Envio', 'metodo_envio_id', 'id');
+    }
+
+    public function pais()
+    {
+        return $this->belongsTo(Pais::class, 'pais_id', 'id');
     }
 }

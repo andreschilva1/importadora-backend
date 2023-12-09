@@ -12,9 +12,7 @@ class AlmacenController extends Controller
     public function obtenerAlmacenes()
     {
         try {
-            // $user = $request->user()->getRoleNames()->first();
-            // $user = auth('web')->user();
-            $almacenes = Almacen::get();
+            $almacenes = Almacen::with("pais")->get();
             return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $almacenes], 200);
         } catch (\Exception $e) {
             return response()->json(['mensaje' => $e->getMessage()], 500);
@@ -28,8 +26,7 @@ class AlmacenController extends Controller
             $almacen = new Almacen();
             $almacen->name = $request->name;
             $almacen->direccion = $request->direccion;
-            $almacen->telefono = $request->telefono;
-            $almacen->pais = $request->pais;
+            $almacen->pais_id = $request->pais_id;
             $almacen->save();
             DB::commit();
             return response()->json(['mensaje' => 'Almacén creado exitosamente'], 200);
@@ -42,7 +39,7 @@ class AlmacenController extends Controller
     public function editAlmacen(Request $request)
     {
         try {
-            $almacen = Almacen::where("id", $request->id)->first();
+            $almacen = Almacen::where("id", $request->id)->with("pais")->first();
             return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $almacen], 200);
         } catch (\Exception $e) {
             return response()->json(['mensaje' => $e->getMessage()], 500);

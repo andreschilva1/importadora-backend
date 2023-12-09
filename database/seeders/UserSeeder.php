@@ -85,7 +85,7 @@ class UserSeeder extends Seeder
             'profile_photo_path' => null,
             'celular' => '65842139',
         ])->assignRole('Cliente');
-        
+
         User::create([
             'name' => 'Miguel',
             'email' => 'miguel@gmail.com',
@@ -93,6 +93,5 @@ class UserSeeder extends Seeder
             'profile_photo_path' => null,
             'celular' => '78921435',
         ])->assignRole('Cliente');
-                
     }
 }

@@ -13,13 +13,38 @@ class PaqueteSeeder extends Seeder
      */
     public function run(): void
     {
-        Paquete::create([
-            'photo_path' => 'https://aws-sw1.s3.amazonaws.com/paquete1.jpg',
-            'codigo_rastreo' => 'RF547031698US',
-            'peso' => '10',
-            'cliente_id' => '1',
-            'empleado_id' => '2',
-            'almacen_id' => '1',
-        ]);
+        Paquete::create(
+            [
+                'photo_path' => 'https://aws-sw1.s3.amazonaws.com/paquete1.jpg',
+                'codigo_rastreo' => 'RF547031698US',
+                'peso' => '10',
+                'cliente_id' => '1',
+                'empleado_id' => '2',
+                'almacen_id' => '1',
+                'consolidacion_estado_id' => '2'
+            ],
+        );
+        Paquete::create(
+            [
+                'photo_path' => 'https://aws-sw1.s3.amazonaws.com/paquete1.jpg',
+                'codigo_rastreo' => 'RF547031698US',
+                'peso' => '5',
+                'cliente_id' => '1',
+                'empleado_id' => '2',
+                'almacen_id' => '1',
+                'consolidacion_estado_id' => '2'
+            ],
+        );
+        Paquete::create(
+            [
+                'photo_path' => 'https://aws-sw1.s3.amazonaws.com/paquete1.jpg',
+                'codigo_rastreo' => 'RF547031698US',
+                'peso' => '2',
+                'cliente_id' => '1',
+                'empleado_id' => '2',
+                'almacen_id' => '1',
+                'consolidacion_estado_id' => '2'
+            ],
+        );
     }
 }
