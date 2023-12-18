@@ -13,12 +13,12 @@ class EnvioSeeder extends Seeder
      */
     public function run(): void
     {
-        Envio::create([
-            'codigo_rastreo' => 'RB326878831US',
+        /* Envio::create([
+            'codigo_rastreo' => null, //RB326878831US
             'costo' => '350',
             'paquete_id' => '1',
-            'metodo_envio_id' => '2',
+            'metodo_envio_id' => '1',
             'envio_estado_id' => '1',
-        ]);
+        ]); */
     }
 }

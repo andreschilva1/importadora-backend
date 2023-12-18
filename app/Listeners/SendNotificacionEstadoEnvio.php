@@ -2,14 +2,13 @@
 
 namespace App\Listeners;
 
-use App\Events\NotificacionPaquete;
+use App\Events\NotificacionEstadoEnvio;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 
-class SendNotificacionPaquete
+class SendNotificacionEstadoEnvio
 {
     /**
      * Create the event listener.
@@ -22,9 +21,10 @@ class SendNotificacionPaquete
     /**
      * Handle the event.
      */
-    public function handle(NotificacionPaquete $evento): void
+    public function handle(NotificacionEstadoEnvio $evento): void
     {
-        $paquete = $evento->paquete;
+        $envio = $evento->envio;
+        $paquete = $envio->paquete;
         $cliente = $paquete->cliente;
 
         //Log::info($cliente->token_android);
@@ -37,18 +37,17 @@ class SendNotificacionPaquete
         $body = '{
           "to": "'.$cliente->token_android.'",
           "notification": {
-            "title": "Registro de paquete"
-            "body": "tiene un nuevo paquete registrado con el codigo de rastreo: '.$paquete->codigo_rastreo.'",
+            "title": "Actualizacion del envio"
+            "body": "su paquete con # '.$paquete->codigo_rastreo.' paso a estado: '.$envio->envioEstado->name.'",
             "image": "'.$paquete->photo_path.'"
           },
           "data": {
-            "type": "registro-paquete",
+            "paquete_id": "'.$paquete->id.'",
+            "peso": "'. $paquete->peso .'",
+            "type": "estado-envio",
           }
         }';
         $request = new Request('POST', 'https://fcm.googleapis.com/fcm/send', $headers, $body);
         $res = $client->sendAsync($request)->wait();
-       
-        
-        
     }
 }

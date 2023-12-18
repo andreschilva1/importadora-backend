@@ -25,10 +25,46 @@ class PaqueteController extends Controller
             $rol = $user->getRoleNames()->first();
 
             if ($rol == "Cliente") {
-                $paquetes = Paquete::where('cliente_id', $user->id)->where('consolidado_id', null)->get();
+                $paquetes = Paquete::where('cliente_id', $user->cliente->id)->where('consolidado_id', null)->where('consolidacion_estado_id',null)->whereDoesntHave('envio')->get();
                 return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
             } else {
-                $paquetes = Paquete::where('consolidado_id', null)->get();
+                $paquetes = Paquete::where('consolidado_id', null)->where('consolidacion_estado_id',null)->whereDoesntHave('envio')->get();
+                return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => $e->getMessage()], 500);
+        }
+    }
+    public function obtenerPaquetesConsolidados(Req $req)
+    {
+        try {
+            $user = $req->user();
+            $rol = $user->getRoleNames()->first();
+
+            if ($rol == "Cliente") {
+                $paquetes = Paquete::where('cliente_id', $user->cliente->id)->where('consolidado_id', null)->where('consolidacion_estado_id',"!=",null)->whereDoesntHave('envio')->get();
+                return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
+            } else {
+                $paquetes = Paquete::where('consolidado_id', null)->where('consolidacion_estado_id',"!=", null)->whereDoesntHave('envio')->get();
+                return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['mensaje' => $e->getMessage()], 500);
+        }
+    }
+
+    public function obtenerPaquetesEnviados(Req $req)
+    {
+        try {
+            $user = $req->user();
+            $rol = $user->getRoleNames()->first();
+
+            if ($rol == "Cliente") {
+                $paquetes = Paquete::join('envios','envios.paquete_id','paquetes.id')->where('cliente_id', $user->cliente->id)->select('paquetes.*')->get();
+                //Log::info($paquetes);
+                return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
+            } else {
+                $paquetes = Paquete::join('envios','envios.paquete_id','paquetes.id')->select('paquetes.*')->get();
                 return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
             }
         } catch (\Exception $e) {
@@ -40,63 +76,83 @@ class PaqueteController extends Controller
     {
         try {
             $user = $req->user();
-            $paquetes = Paquete::where('cliente_id', $user->id)->where('almacen_id', $req->almacenId)->where('consolidado_id', null)->where('consolidacion_estado_id', 2)->get();
+            $paquetes = Paquete::where('cliente_id', $user->id)->where('almacen_id', $req->almacenId)->where('consolidado_id', null)->where('consolidacion_estado_id', null)->whereDoesntHave('envio')->get();
             return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
         } catch (\Exception $e) {
             return response()->json(['mensaje' => $e->getMessage()], 500);
         }
     }
 
-    public function obtenerPaquetesConsolidacion(Req $req)
-    {
-        try {
-            $paquetes = Paquete::where('consolidado_id', $req->paqueteId)->get();
-            return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
-        } catch (\Exception $e) {
-            return response()->json(['mensaje' => $e->getMessage()], 500);
-        }
-    }
+    
 
     public function obtenerPaquetesAlmacenEditar(Req $req)
     {
         try {
             $user = $req->user();
-            $paquetes = Paquete::where('cliente_id', $user->id)->where('almacen_id', $req->almacenId)->where('consolidacion_estado_id', 2)->get();
+            //lista en php
+            $paquetes = array();
+
+            $paquetesDeconsolidacion = Paquete::where('cliente_id', $user->id)->where('consolidado_id', $req->paqueteId)->get();
+            $paquetesDelAlmacen = Paquete::where('cliente_id', $user->id)->where('consolidado_id', null)->where('almacen_id', $req->almacenId)->where('consolidacion_estado_id', null)->whereDoesntHave('envio')->get();
+
+            foreach ($paquetesDeconsolidacion as $paquete) {
+                array_push($paquetes, $paquete);
+            }
+
+            foreach ($paquetesDelAlmacen as $paquete) {
+                array_push($paquetes, $paquete);
+            }
             return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $paquetes], 200);
         } catch (\Exception $e) {
             return response()->json(['mensaje' => $e->getMessage()], 500);
         }
     }
 
-    function reconocerPaquete(Req $req)
+    function guardarimagenPaquete(Req $req)
     {
         try {
             $image = $req->file('imagen');
             $originalName = $image->getClientOriginalName();
-            $fileNameWithoutExtension = pathinfo($originalName, PATHINFO_FILENAME);
-           
-            Log::info($fileNameWithoutExtension);
-
-
-            //comprimir imagen
+            $nameWithoutExtension = pathinfo($originalName, PATHINFO_FILENAME);
+  
             $imageInstance = Image::make($image);
             $newWidth = 1024;
             // Calcular la nueva altura para conservar la relación de aspecto
             $newHeight = intval($newWidth * ($imageInstance->height() / $imageInstance->width()));
-            Log::info($newHeight);
+            // bajando la resolucion a la imagen
             $imageInstance->resize($newWidth, $newHeight);
+            //comprimir imagen
             $encodedImage = (string) $imageInstance->encode('jpg', 40);
             
 
             //guardar en s3
-            $name = $fileNameWithoutExtension . '.jpg';
-            //Log::info($name);
+            $name = $nameWithoutExtension . '.jpg';
             Storage::disk('s3')->put($name, $encodedImage);         
             $imegeUrl = Storage::disk('s3')->url($originalName);
 
+            return response()->json($imegeUrl, 200);
 
+        } catch (\Throwable $th) {
+            return response()->json(
+                [
+                    'mensaje' => $th->getMessage(),
+                ],
+                500
+            );
+        }
+    }
+    
+           
+
+
+    function reconocerPaquete(Req $req)
+    {
+        try {  
+
+            $imegeUrl = $req->imege_url;
             $client = new Client();
 
+            
             $headers = [
                 'Ocp-Apim-Subscription-Key' => config('azure.cognitiveKey'),
                 'Content-Type' => 'application/json'
@@ -116,7 +172,7 @@ class PaqueteController extends Controller
             $endpointToGetResult = (string) $headerResponse["Operation-Location"][0];
 
             //esperamos 3 segundos para obtener los resultados
-            Log::info($endpointToGetResult);
+           // Log::info($endpointToGetResult);
             sleep(2);
             $isDone = false;
             while(!$isDone) {
@@ -129,11 +185,6 @@ class PaqueteController extends Controller
                 $responseResult = $client->sendAsync($requestgetResult)->wait();
                 $responseBody = json_decode($responseResult->getBody());
 
-                //obtener el codigo estado de la solicitud
-                $statusCode = $responseResult->getStatusCode();
-                // Verificar si la operación está completa
-                Log::info($statusCode);
-                Log::info($responseBody->status);
                 if ($responseBody->status == 'succeeded') {
                     $isDone = true;
                 } else {
@@ -146,10 +197,10 @@ class PaqueteController extends Controller
 
             return response()->json(
                 [
-                    'nombre' => $fields->nombre->valueString,
-                    'casillero' => $fields->casillero->valueString,
-                    'direccion' => $fields->direccion->valueString,
-                    'numeroRastreo' => $fields->numeroRastreo->valueString,
+                    'nombre' => $fields->nombre->valueString ?? '',
+                    'casillero' => $fields->casillero->valueString ?? '',
+                    'direccion' => $fields->direccion->valueString ?? '',
+                    'numeroRastreo' => $fields->numeroRastreo->valueString ?? '',
                     'photoPath' => $imegeUrl,
                 ],
                 $responseResult->getStatusCode()
@@ -178,7 +229,6 @@ class PaqueteController extends Controller
             $paquete->almacen_id = $userActual->empleado->almacen_id;
             $paquete->empleado_id = $userActual->id;
             
-            $paquete->consolidacion_estado_id = 2;
             $paquete->save();
             DB::commit();
             
@@ -191,88 +241,7 @@ class PaqueteController extends Controller
         }
     }
 
-    function registrarConsolidacion(Req $req)
-    {
-        try {
-            $userActual = $req->user();
-            DB::beginTransaction();
-            $paquete = Paquete::findOrFail($req->paqueteId);
-            $paquete->peso = $req->peso;
-            $paquete->photo_path = $req->photo_path;
-            $paquete->codigo_rastreo = $req->codigo_rastreo;
-            $paquete->empleado_id = $userActual->id;
-            $paquete->consolidacion_estado_id = 2;
-            $paquete->save();
-            DB::commit();
+    
 
-
-            return response()->json(['mensaje' => 'Paquete creado exitosamente'], 200);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return response()->json(['mensaje' => $th->getMessage()], 500);
-        }
-    }
-
-    function createConsolidacion(Req $req)
-    {
-        try {
-            $userActual = $req->user();
-            DB::beginTransaction();
-            $paquete = new Paquete();
-            $paquete->peso = $req->peso;
-            $paquete->cliente_id = $userActual->id;
-            $paquete->almacen_id = $req->almacenId;
-            $paquete->empleado_id = null;
-            $paquete->consolidacion_estado_id = 1;
-            $paquete->save();
-
-            $paquetesIds = $req->lista_ids_paquetes;
-
-            $paquetes = Paquete::whereIn('id', $paquetesIds)->get();
-            foreach ($paquetes as $paq) {
-                $paq->consolidado_id = $paquete->id;
-                $paq->save();
-            }
-
-            $paquete->save();
-            DB::commit();
-
-            return response()->json(['mensaje' => 'Consolidación creado exitosamente'], 200);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return response()->json(['mensaje' => $th->getMessage()], 500);
-        }
-    }
-
-    function editConsolidacion(Req $req)
-    {
-        try {
-            DB::beginTransaction();
-            $paquete = Paquete::findOrFail($req->paqueteId);
-            $paquete->peso = $req->peso;
-            $paquete->save();
-
-            $paquetes = Paquete::where('consolidado_id', $req->paqueteId)->get();
-            foreach ($paquetes as $paq) {
-                $paq->consolidado_id =  null;
-                $paq->save();
-            }
-
-            $paquetesIds = $req->lista_ids_paquetes;
-
-            $paquetesEditar = Paquete::whereIn('id', $paquetesIds)->get();
-            foreach ($paquetesEditar as $paq) {
-                $paq->consolidado_id = $paquete->id;
-                $paq->save();
-            }
-
-            $paquete->save();
-            DB::commit();
-
-            return response()->json(['mensaje' => 'Consolidación editado exitosamente'], 200);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            return response()->json(['mensaje' => $th->getMessage()], 500);
-        }
-    }
+    
 }

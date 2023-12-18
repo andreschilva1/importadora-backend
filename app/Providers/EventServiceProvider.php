@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Events\NotificacionEstadoEnvio;
 use App\Events\NotificacionPaquete;
+use App\Listeners\SendNotificacionEstadoEnvio;
 use App\Listeners\SendNotificacionPaquete;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -23,6 +25,10 @@ class EventServiceProvider extends ServiceProvider
 
         NotificacionPaquete::class => [
             SendNotificacionPaquete::class,
+        ],
+
+        NotificacionEstadoEnvio::class => [
+            SendNotificacionEstadoEnvio::class,
         ],
 
     ];

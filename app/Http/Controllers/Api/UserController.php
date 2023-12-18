@@ -40,7 +40,17 @@ class UserController extends Controller
     public function getEmployees()
     {
         try {
-            $empleados = User::role('Empleado')->get();
+
+            /* $empleados = User::role('Empleado')->get(); */
+
+            $roles = [
+                'Encargado de Almacen',
+                'Encargado de Envio',
+                'Encargado de compra'
+            ];
+            $empleados = User::whereHas('roles', function ($query) use ($roles) {
+                $query->whereIn('name', $roles);
+            })->get();
             return response()->json(['mensaje' => 'Consulta exitosa', 'data' => $empleados], 200);
         } catch (\Exception $e) {
             return response()->json(['mensaje' => $e->getMessage()], 500);

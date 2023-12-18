@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\NotificacionEstadoEnvio;
 use App\Http\Controllers\Controller;
 use App\Models\Envio;
 use App\Models\MetodoEnvio;
@@ -70,6 +71,7 @@ class EnvioController extends Controller
             $envio->envio_estado_id = $request->envio_estado_id;
             $envio->update();
             DB::commit();
+            NotificacionEstadoEnvio::dispatch($envio);
             return response()->json(['mensaje' => 'Envío actualizado'], 200);
         } catch (\Exception $e) {
             return response()->json(['mensaje' => $e->getMessage()], 500);
