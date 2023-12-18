@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\NotificacionEstadoEnvio;
+use App\Events\NotificacionPaquete;
+use App\Listeners\SendNotificacionEstadoEnvio;
+use App\Listeners\SendNotificacionPaquete;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -18,6 +22,15 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+
+        NotificacionPaquete::class => [
+            SendNotificacionPaquete::class,
+        ],
+
+        NotificacionEstadoEnvio::class => [
+            SendNotificacionEstadoEnvio::class,
+        ],
+
     ];
 
     /**
@@ -25,7 +38,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        
     }
 
     /**

@@ -17,33 +17,30 @@ class PaqueteSeeder extends Seeder
             [
                 'photo_path' => 'https://aws-sw1.s3.amazonaws.com/paquete1.jpg',
                 'codigo_rastreo' => 'RF547031698US',
-                'peso' => '10',
+                'peso' => '1',
                 'cliente_id' => '1',
-                'empleado_id' => '2',
+                'empleado_id' => '1',
                 'almacen_id' => '1',
-                'consolidacion_estado_id' => '2'
             ],
         );
         Paquete::create(
             [
                 'photo_path' => 'https://aws-sw1.s3.amazonaws.com/paquete1.jpg',
-                'codigo_rastreo' => 'RF547031698US',
-                'peso' => '5',
+                'codigo_rastreo' => 'RF547031789US',
+                'peso' => '1',
                 'cliente_id' => '1',
-                'empleado_id' => '2',
+                'empleado_id' => '1',
                 'almacen_id' => '1',
-                'consolidacion_estado_id' => '2'
             ],
         );
         Paquete::create(
             [
                 'photo_path' => 'https://aws-sw1.s3.amazonaws.com/paquete1.jpg',
-                'codigo_rastreo' => 'RF547031698US',
-                'peso' => '2',
+                'codigo_rastreo' => 'RF547031876US',
+                'peso' => '1',
                 'cliente_id' => '1',
-                'empleado_id' => '2',
+                'empleado_id' => '1',
                 'almacen_id' => '1',
-                'consolidacion_estado_id' => '2'
             ],
         );
     }

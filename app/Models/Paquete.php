@@ -26,6 +26,11 @@ class Paquete extends Model
         return $this->hasOne('App\Models\Envio', 'paquete_id', 'id');
     }
 
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class, 'cliente_id', 'id');
+    }
+    
     public function paquete()
     {
         return $this->hasMany('App\Models\Paquete', 'consolidado_id', 'id');
